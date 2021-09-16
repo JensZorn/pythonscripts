@@ -1,6 +1,0 @@
-print("Eine Zahl: ")
-x = input()
-print("Eine weitere Zahl: ")
-y = input()
-sum = float(x) + float(y)
-print("Das Ergebnis ist: ", sum)
