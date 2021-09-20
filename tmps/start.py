@@ -26,7 +26,8 @@ def typewriter(input):
         sleep(0) #in seconds
         sys.stdout.write(letter)
 
-
+print("Test)")
+exec(open("simplechat").read())
 #filepaths = [f.path for f in os.scandir('.') if f.is_file()]
 #dirpaths  = [f.path for f in os.scandir('.') if f.is_dir()]
 #print(filepaths)
