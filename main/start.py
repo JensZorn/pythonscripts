@@ -13,6 +13,7 @@ from time import sleep
 import random
 import sys
 import enquiries
+import os
 
 # global variables / config
 global language
@@ -25,3 +26,8 @@ def typewriter(input):
         sleep(0) #in seconds
         sys.stdout.write(letter)
 
+
+#filepaths = [f.path for f in os.scandir('.') if f.is_file()]
+#dirpaths  = [f.path for f in os.scandir('.') if f.is_dir()]
+#print(filepaths)
+#print(dirpaths)
