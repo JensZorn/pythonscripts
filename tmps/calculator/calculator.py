@@ -12,14 +12,22 @@ from time import sleep
 import sys
 import random
 import enquiries
-from littlecalculatorthingtexts import *
+from config import *
+import yaml
+
+#def read_yaml(file_path):
+#    with open(file_path, "r") as f:
+#        return yaml.safe_load(f)
+
+#test = read_yaml("tmps/config.yaml")
+#print(test["APP"])
 
 
 # global variables
 #global start
 #start = 1    
-global language
-language = english
+#global language
+#language = test["APP"]["LANGUAGE"]
 
 # functions
 class math():
@@ -32,8 +40,8 @@ class math():
 
 # greeter and menu
     def startprogramm():
-        
-        math.language()
+        print(language["greetermenutextstart"])
+        math.menu()
 
 
 # navigate through options
@@ -59,18 +67,16 @@ class math():
 
 
 # function to change program language
-    def language():
-        global language
-        options = "english", "deutsch"
-        choice = enquiries.choose('Wähle! ', options)
-        getattr(math, choice)()
-
-        math.typewriter(language['greeterchooselang'])
-        lang = input()
-        lang = int(lang)
-        if lang == 1:
-            language = english
-        math.menu()
+#    def language():
+#        global language
+#        options = "english", "deutsch"
+#        choice = enquiries.choose('Wähle! ', options)
+#        if choice == "english":
+#            language = english
+#        elif choice == "deutsch":
+#            language = deutsch
+#        print(language)
+#        math.menu()
     #elif lang == 2:
     #    language = deutsch
     #    if a == 1:

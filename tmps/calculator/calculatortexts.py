@@ -86,7 +86,7 @@ Choose: """,
 
 # first text after language menu. Greeter and menu
 "greetermenutextstart" : """
-___________________Welcome!______________________\n
+___________________Willkommen!______________________\n
 This is a small program to calculate some things.
 You can choose between a small calculator and a
 calculator to convert values. I hope it will be 
