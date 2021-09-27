@@ -1,5 +1,7 @@
 list_languages = ["english", "deutsch"]
 english = {
+    "calculator" : "calculator programm",
+    "simplechat" : "simplechat programm",
     "exit" : "exit programm",
     "changelanguage" : "change language",
     "chooselanguage" : "change language",
@@ -9,6 +11,8 @@ english = {
     "menuchoice" : "You Du hast folgendes gewählt:"
 }
 deutsch = {
+    "calculator" : "Rechner programm",
+    "simplechat" : "Chat programm",
     "exit" : "Beenden",
     "changelanguage" : "Sprache ändern",
     "chooselanguage" : "change language",
