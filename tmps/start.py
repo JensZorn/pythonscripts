@@ -66,7 +66,7 @@ def typewriter(input):
     for letter in str(input):
         seconds = random.uniform(0, 0)
         sleep(seconds) #in seconds
-        print(letter, end = '')
+        print(letter, end=' ')
     print("")
 
 #
