@@ -1,6 +1,7 @@
 list_languages = ["english", "deutsch"]
 english = {
     "calculator" : "calculator programm",
+    "salarycalculator" : "salary calculator programm",
     "simplechat" : "simplechat programm",
     "exit" : "exit programm",
     "changelanguage" : "change language",
@@ -12,6 +13,7 @@ english = {
 }
 deutsch = {
     "calculator" : "Rechner programm",
+    "salarycalculator" : "Gehaltsrechner",
     "simplechat" : "Chat programm",
     "exit" : "Beenden",
     "changelanguage" : "Sprache ändern",

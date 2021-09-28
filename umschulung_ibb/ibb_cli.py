@@ -1,8 +1,7 @@
-# -*- coding: UTF-8 -*-
-#######################################################################################
-#                              <°))))><
+# -*- coding: UTF-8 -*- ###############################################################
+#                             <°))))><
 #
-#               An example for command line interfaces
+#               An example for command line interfaces and their usage
 #
 #                           by Jens Zorn
 #
@@ -33,6 +32,8 @@ import sys
 import enquiries
 import argparse
 import click
+from PyInquirer import prompt
+from pprint import pprint
 
 # create your own CLI with your own logic and parsing etc.
 def own_cli():
@@ -67,7 +68,11 @@ def enquiries_cli():
 
 # use the standard library for CLIs in Python: argparse
 def cli_with_argparse():
-    print("test ")
+    parser = argparse.ArgumentParser(description='Add some integers.')
+    parser.add_argument('integers', metavar='N', type=str, nargs='+',help='interger list')
+    parser.add_argument('--greeting', action='store_const',const=sum, default=max,help='sum the integers (default: find the max)')
+    args = parser.parse_args()
+    print(args.integers[0] + " meets " + args.integers[1])
 
 #cli_with_argparse()
 
@@ -77,6 +82,27 @@ def cli_with_argparse():
 @click.argument('name')
 @click.option('--greeting', '-g')
 def main(name, greeting):
-    click.echo("{}, {}".format(greeting, name))
+    click.echo(f"{name}, meets {greeting}")
 
-main()
+#main()
+
+# yet another library PyInquirer
+def pyinquirer():
+    questions = [
+        {
+            'type': 'input',
+            'name': 'first_name',
+            'message': 'What\'s your first name',
+        }
+    ]
+    answers = prompt(questions)
+    pprint(answers)
+
+#pyinquirer()
+
+# other interesting librarys:
+# - Docopt (for CLI)
+# - Clint (for colors, usw. (all-in-one CLI library))
+# - Cement
+# - Cliff
+# - Plac
