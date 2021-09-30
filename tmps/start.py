@@ -67,6 +67,8 @@ def menu(installpath):
     for names in list(subfolders):
         if names in dontshow:
             continue
+        elif names not in config.language:
+            continue
         else:
             menulist.append(config.language[names])
             folders.append(names)

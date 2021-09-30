@@ -2,6 +2,7 @@ list_languages = ["english", "deutsch"]
 english = {
     "calculator" : "calculator programm",
     "salarycalculator" : "salary calculator programm",
+    "vionadateiensortieren" : "Viona-Dateien sortieren",
     "simplechat" : "simplechat programm",
     "exit" : "exit programm",
     "changelanguage" : "change language",
@@ -14,6 +15,7 @@ english = {
 deutsch = {
     "calculator" : "Rechner programm",
     "salarycalculator" : "Gehaltsrechner",
+    "vionadateiensortieren" : "Viona-Dateien sortieren",
     "simplechat" : "Chat programm",
     "exit" : "Beenden",
     "changelanguage" : "Sprache ändern",
