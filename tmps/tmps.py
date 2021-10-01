@@ -1,26 +1,33 @@
-#######################################################################################
-#
-#
-#               A small programm to calculate some things
-#
-#                           by Jens Zorn
-#
-#
-#
-#######################################################################################
+# -*- coding: UTF-8 -*- ###############################################################
 #!/usr/bin/env python3
+#                             <°))))><
+#
+#               Main menu for my small projects
+#
+#               by Jens Zorn
+#
+#
+#               I wrote this to list my projects and to access them using a menu.
+#               The scripts is searching for child directories and automatically lists them
+#               as options in the menu if they are defined within the language files
+#               (found in config directory).
+#               The subpackages must contain an __init__.py file which executes the
+#               subpackage to run properly.
+#               Additionally you can change the language of the program.
+#
+#
+#               /o)_/_/_/__/ )          --         ( \__\_\_\_(o\
+#               \ ) \ \ \  \ )          --         ( /  / / / ( /
+#######################################################################################
 # imports
 from time import sleep
 import random
 import sys
 import enquiries
-import subprocess
 import os
 from os import system, name
-import config
-import starttexts
+from config import config
 import yaml
-
 #
 # to clear the console
 #
@@ -47,11 +54,11 @@ def typewriter(input):
 #
 def changelanguage():
     global language
-    choice = enquiries.choose(config.language['chooselanguage'], starttexts.list_languages)
-    with open('tmps/config.yaml') as f:
+    choice = enquiries.choose(config.language['chooselanguage'], config.list_languages)
+    with open('tmps/config/config.yaml') as f:
         doc = yaml.load(f)
     doc['language'] = choice
-    with open('tmps/config.yaml', 'w') as f:
+    with open('tmps/config/config.yaml', 'w') as f:
         yaml.dump(doc, f)
     config.load_settings()
 
@@ -82,7 +89,10 @@ def menu(installpath):
     elif choice == 'changelanguage':
         changelanguage()
     else:
-        subprocess.check_call(["python3.9", f"tmps/{choice}/{choice}.py"])
+        exec(f"import {choice}")
+        del sys.modules[choice]
+
+
 
 #
 # to exit programm
@@ -91,18 +101,4 @@ def exit():
     sys.exit()
 
 
-#
-# everything starts here
-#
-if __name__ == "__main__" or __name__ == "start":
-    clear()
-    changelanguage()
-    clear()
-    typewriter(config.language['programmstart'])
-    while True:
-        menu(config.installpath)
-        clear()
-        typewriter(config.language['programmgreeter'])
-else:
-    print("Never import the main module!")
-    print(__name__)
+
