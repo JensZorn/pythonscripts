@@ -21,6 +21,7 @@
 #######################################################################################
 # imports
 from time import sleep
+from importlib import import_module
 import random
 import sys
 import enquiries
@@ -89,7 +90,7 @@ def menu(installpath):
     elif choice == 'changelanguage':
         changelanguage()
     else:
-        exec(f"import {choice}")
+        import_module(choice)
         del sys.modules[choice]
 
 
