@@ -102,3 +102,22 @@ def exit():
 
 
 
+# imports
+#import tmps
+#from config import config
+
+#
+# everything starts here
+#
+if __name__ == "__main__" or __name__ == "start":
+    clear()
+    changelanguage()
+    clear()
+    typewriter(config.language['programmstart'])
+    while True:
+        menu(config.installpath)
+        clear()
+        typewriter(config.language['programmgreeter'])
+else:
+    print("Never import the main module!")
+    print(__name__)
