@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*- 
 #######################################################################################
-#                             <°))))><
+#
 #
 #               Types of variables and accessing them
 #
@@ -12,10 +12,10 @@
 #               - assignment operator is =
 #
 #
-#               /o)_/_/_/__/ )          --         ( \__\_\_\_(o\
-#               \ ) \ \ \  \ )          --         ( /  / / / ( /
+#
+#<°))))><
 #######################################################################################
-
+'''
 # assignment
 a = 1
 # multiple assignment
@@ -170,4 +170,4 @@ Converts an integer to a hexadecimal string.
 
 oct(x)
 
-Converts an integer to an octal string.
+Converts an integer to an octal string.'''
