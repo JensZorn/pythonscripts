@@ -46,7 +46,7 @@ def clear():
 #
 def typewriter(input):
     for letter in str(input):
-        seconds = random.uniform(0, 0)
+        seconds = random.uniform(0, 0.1) # Change here for duration of pause
         sleep(seconds) #in seconds
         print(letter, end='')
     print("")
