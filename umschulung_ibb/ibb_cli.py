@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*- 
+# -*- coding: UTF-8 -*-
 #######################################################################################
 #
 #               An example for command line interfaces and their usage
@@ -18,11 +18,11 @@
 #               run into an error (e.g. 'rm /home/user/test.py' <- '/home/user/text.py' is
 #               required by the command 'rm', without it it does not know what to remove)
 #               - options: optional parameters which are not required but can help the program
-#               to understand what you want (e.g. 'rm -r' <- '-r' is optional, tells the 
+#               to understand what you want (e.g. 'rm -r' <- '-r' is optional, tells the
 #               command 'rm' to recursively remove files within directories (all files))
 #               - flags: flags are special option parameters. They are not required and tell
-#               tell the program to show certain behaviour (e.g. 'rm --help' <- '--help' 
-#               tells the script to show the help for the corresponding command, in this 
+#               tell the program to show certain behaviour (e.g. 'rm --help' <- '--help'
+#               tells the script to show the help for the corresponding command, in this
 #               case 'rm')
 #
 #
@@ -37,6 +37,8 @@ from PyInquirer import prompt
 from pprint import pprint
 
 # create your own CLI with your own logic and parsing etc.
+
+
 def own_cli():
     while True:
         your_command = input("Type your command (-help for help): ")
@@ -52,6 +54,8 @@ def own_cli():
 #own_cli()
 
 # use libraries which provide useful possibilities to make nice CLIs
+
+
 def enquiries_cli():
     while True:
         options = ["menu", "help", "exit"]
@@ -68,10 +72,14 @@ def enquiries_cli():
 #enquiries_cli()
 
 # use the standard library for CLIs in Python: argparse
+
+
 def cli_with_argparse():
     parser = argparse.ArgumentParser(description='Add some integers.')
-    parser.add_argument('integers', metavar='N', type=str, nargs='+',help='interger list')
-    parser.add_argument('--greeting', action='store_const',const=sum, default=max,help='sum the integers (default: find the max)')
+    parser.add_argument('integers', metavar='N', type=str,
+                        nargs='+', help='interger list')
+    parser.add_argument('--greeting', action='store_const', const=sum,
+                        default=max, help='sum the integers (default: find the max)')
     args = parser.parse_args()
     print(args.integers[0] + " meets " + args.integers[1])
 
@@ -91,6 +99,8 @@ def main(name, greeting):
 #main()
 
 # yet another library PyInquirer
+
+
 def pyinquirer():
     questions = [
         {
@@ -107,7 +117,7 @@ def pyinquirer():
     answers = prompt(questions)
     pprint(answers)
 
-#pyinquirer()
+# pyinquirer()
 
 # other interesting librarys:
 # - Docopt (for CLI)

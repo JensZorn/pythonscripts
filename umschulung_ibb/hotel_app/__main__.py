@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*- 
-#######################################################################################
+# -*- coding: UTF-8 -*-
+###############################################################################
 #
 #
-#               A small programm to work with classes and GUI
+#               hotel app
 #
 #               by Jens Zorn
 #
@@ -11,191 +11,245 @@
 #
 #
 #
-#<°))))><
-#######################################################################################
+# <°))))><
+###############################################################################
 import tkinter as tk
-from tkinter import *
-from tkinter import ttk
-import sys
+from tkinter import NSEW, StringVar, E, Scrollbar, Listbox, DISABLED, END
+# from tkinter import ttk
+import os
+# import json, sys
 
-#from Hotel_Gaeste import *
-#from Hotel import *
+
+class AutoScrollbar(tk.Scrollbar):
+    # a scrollbar that hides itself if it's not needed.
+    # only works with grid
+    def set(self, low, high):
+        if float(low) <= 0.0 and float(high) >= 1.0:
+            self.tk.call("grid", "remove", self)
+        else:
+            self.grid()
+        tk.Scrollbar.set(self, low, high)
 
 
 class root(tk.Tk):
+
+    current_page = ""
+    login = False
+    pages = {}
+
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.title(hotel.hotelname + " Zimmerbelegung und Buchung")
+        # root window settings
+        self.title("Test Window")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
 
-        mainwindow = tk.Frame(self)
-        mainwindow.grid(row=0, column=0, sticky=N+S+E+W)
-        self.frames = {}
-        for F in (rootwindow, guestpage):
-            frame_name = F.__name__
-            frame = F(parent=mainwindow)
-            self.frames[frame_name] = frame
-            frame.grid(sticky=N+S+E+W)
+        # root frame, holds every content
+        self.root_window = tk.Frame(self)
+        self.root_window.grid(row=0, column=0, sticky=NSEW)
+        self.root_window.rowconfigure(1, weight=1)
+        self.root_window.columnconfigure(0, weight=1)
 
-        self.upper_menu_bar()
-        self.show_frame("rootwindow")
-        self.update_idletasks() 
-        self.window_width= frame.winfo_width()
+        # main window content (between menubar and statusbar)
+        self.root_canvas = tk.Canvas(self.root_window, background="black")
+        self.root_canvas.grid(row=1, column=0, sticky=NSEW)
+        self.root_content = tk.Frame(self.root_canvas, background="cyan")
+        # self.root_content.rowconfigure(0, weight=1)
+        # self.root_content.columnconfigure(0, weight=1)
+
+        # scrollbars for root window
+        self.vertical_scrollbar = AutoScrollbar(
+            self.root_window, orient="vertical",
+            command=self.root_canvas.yview)
+        self.vertical_scrollbar.grid(row=1, column=1, rowspan=1, sticky="ns")
+        self.horizontal_scrollbar = AutoScrollbar(
+            self.root_window, orient="horizontal",
+            command=self.root_canvas.xview)
+        self.horizontal_scrollbar.grid(row=2, column=0, sticky="ew")
+        # make scrollbars react to windowsize changes
+        self.root_content.bind("<Configure>",
+                               lambda e: self.root_canvas.configure(
+                                   scrollregion=self.root_canvas.bbox("all")))
+        self.root_content_id = self.root_canvas.create_window(
+            (0, 0), window=self.root_content, anchor="nw")
+        self.root_canvas.configure(yscrollcommand=self.vertical_scrollbar.set)
+        self.root_canvas.configure(
+            xscrollcommand=self.horizontal_scrollbar.set)
+        # adjust positioning of root_content_id inside the canvas on resizing
+        # the window
+        self.root_canvas.bind("<Configure>", self.on_resize_window)
+
+        # initialize menu bar and statusbar
+        self.menu_bar()
         self.statusbar()
-        
-    def upper_menu_bar(self):
-        self.menubar = tk.Menu(self, bd=1, relief=tk.RAISED)
-        self.filemenu = tk.Menu(self.menubar)
-        self.filemenu.add_command(label="Open")
-        self.filemenu.add_command(label="Save")
-        self.filemenu.add_command(label="Exit", command=quit)
-        self.menubar.add_cascade(label="File", menu=self.filemenu)
+
+        # initialize Welcome_Page for login, tbd. gets destroyed on finish,
+        # then load Main_Page
+        self.change_page("Welcome_Page")
+        self.update_idletasks()
+
+    def change_page(self, wanted_page):
+        if not root.login:
+            self.page = Welcome_Page(parent=self.root_content)
+            self.page.grid(row=0, column=0, sticky=NSEW)
+            #
+            print(root.login)
+            # root.login = True
+        elif root.pages == {}:
+            for P in (Main_Page, Second_Page, Error_Page):
+                page_name = P.__name__
+                page = P(parent=self.root_content)
+                page.grid(row=0, column=0, sticky="nwes")
+                root.pages[page_name] = page
+            self.page = root.pages["Error_Page"]
+            self.page.tkraise()
+            print(root.login)
+        elif wanted_page == "Welcome_Page" and root.login and root.pages != {}:
+            self.page = root.pages["Error_Page"]
+            self.page.tkraise()
+            print(root.login)
+        else:
+            self.page = self.pages[wanted_page]
+            self.page.tkraise()
+            print(root.login)
+        root.current_page = self.page
+        self.update_idletasks()
+
+    def on_resize_window(self, newwindow):
+        self.update_idletasks()
+        x = (newwindow.width / 2) - (root.current_page.winfo_width() / 2)
+        self.statb_upd = ("Fenstergröße: " + str(newwindow.width)
+                          + ", Canvasgröße: "
+                          + str(self.root_canvas.winfo_width())
+                          + " : Position: " + str(x) + " = "
+                          + str(newwindow.width / 2) + " - "
+                          + str(self.current_page.winfo_width() / 2)
+                          + ", Position: "
+                          + str(self.root_canvas.coords(self.root_content_id)))
+        self.text.set(self.statb_upd)
+        self.root_canvas.coords(self.root_content_id, x, 0)
+        self.update_idletasks()
+
+    def menu_bar(self):
+        self.menu_bar_frame = tk.Frame(self.root_window)
+        self.menu_bar_frame.grid(row=0, column=0, sticky="nwe")
+        self.menubar = tk.Menu(self.menu_bar_frame)
+        # self.file_menu = tk.Menu(self.menubar)
+        # self.file_menu.add_command(label="second",
+        # command= lambda: self.change_page("Second_Page"))
+        # self.file_menu.add_command(label="Exit", command=quit)
+        # self.menubar.add_cascade(label="File", menu=self.file_menu)
+        self.menubar.add_command(
+            label="welcome", command=lambda: self.change_page("Welcome_Page"))
+        self.menubar.add_command(
+            label="main", command=lambda: self.change_page("Main_Page"))
+        self.menubar.add_command(
+            label="second", command=lambda: self.change_page("Second_Page"))
+        self.menubar.add_command(label="Exit", command=quit)
         self.config(menu=self.menubar)
 
     def statusbar(self):
-        self.img = tk.PhotoImage() # zero size image
-        self.statusbar = tk.Frame(self, bd=1, relief=tk.SUNKEN)
-        self.statusbar.grid(row = 1, column = 0, sticky="ws")
-        self.statusbar_label = tk.Label(self.statusbar, width=self.window_width, height=15, text="Statusbar", image=self.img, compound=tk.CENTER, anchor=tk.W)
-        self.statusbar_label.grid(row=0, column=0)
+        self.login1 = "Nö"
+        self.text = StringVar()
+        self.text.set(self.login1)
+        self.statusbar_frame = tk.Frame(self.root_window)
+        self.statusbar_frame.grid(row=3, column=0, sticky="nwe")
+        label = tk.Label(self.statusbar_frame, textvariable=self.text)
+        label.grid(row=0, column=0)
 
-    def show_frame(self, frame_name):
-        frame = self.frames[frame_name]
-        frame.tkraise()
 
-    def quit(self):
-        self.shutdown()
-        sys.exit()
-
-class rootwindow(tk.Frame):
+class Welcome_Page(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent)
+        super().__init__(parent)
+        subfolders = [f.name for f in os.scandir(
+            "umschulung_ibb/hotel_app") if f.is_dir()]
+        header = tk.Label(
+            self, text="""Willkommen im Hotelmanager.\n
+            Wähle dein Hotel aus, oder lege ein neues an.""")
+        header.grid(row=0, column=0)
 
-        #Versuch einer Scrollbar
-        self.scrollbar = Scrollbar(self)
-        self.scrollbar.grid(row=1, column=1, rowspan=5, padx=5, pady=5)
+        hotel_list_scrollbar = Scrollbar(self)
+        hotel_list_scrollbar.grid(row=1, column=1, sticky="nsw")
+        hotel_list = Listbox(
+            self, width=40, yscrollcommand=hotel_list_scrollbar.set)
+        hotel_list.grid(row=1, column=0, sticky=E)
+        hotel_list_scrollbar.config(command=hotel_list.yview)
 
-        #Zimmerliste links
-        self.zimmerliste = Listbox(self, width=30, height=20, selectmode=SINGLE, yscrollcommand=self.scrollbar.set)
-        self.zimmerliste.grid(row=1, column=0, rowspan=5, padx=5, pady=5)
-        i=1
-        for zimmer in hotel.zimmerauflistung:
-            self.zimmerliste.insert(i, "Zimmernr. " + str(zimmer.zimmernummer) + ", Status: " + zimmer.status)
-            i+=1
-        self.zimmerliste.bind('<<ListboxSelect>>', self.show_detail)
+        button = tk.Button(self, text="Select")
+        button.grid(row=2, column=0, sticky=E)
+        button1 = tk.Button(self, text="Create New")
+        button1.grid(row=2, column=1, sticky=E)
+        if subfolders == []:
+            button.config(state=DISABLED)
+        else:
+            for folder in subfolders:
+                n = int(20 - len(folder)/2)
+                print(n)
+                print(len(folder))
+                folder = "  "*(n-1) + folder
+                hotel_list.insert(END, str(folder))
 
-        #Zimmerdetails
-        ttk.Label(self, text = "Zimmernr: ").grid(row = 1, column = 2)
-        self.zimmernr_entry = ttk.Entry(self, width=20)
-        self.zimmernr_entry.grid(row = 1, column = 3)
-        ttk.Label(self, text = "Status: ").grid(row = 2, column = 2)
-        self.status_entry = ttk.Entry(self, width=20)
-        self.status_entry.grid(row = 2, column = 3)
-        ttk.Label(self, text = "Gast: ").grid(row = 3, column = 2)
-        self.gast_entry = ttk.Entry(self, width=20)
-        self.gast_entry.grid(row = 3, column = 3)
-
-        #Gastdetails
-        self.checkin_gastname_entry = ttk.Entry(self, width=20)
-        self.checkin_gastname_entry.grid(row = 6, column = 0)
-        self.checkin_geburtsdatum_entry = ttk.Entry(self, width=20)
-        self.checkin_geburtsdatum_entry.grid(row = 6, column = 3)
-        self.checkin_anreise_entry = ttk.Entry(self, width=20)
-        self.checkin_anreise_entry.grid(row = 7, column = 0)
-        self.checkin_abreise_entry = ttk.Entry(self, width=20)
-        self.checkin_abreise_entry.grid(row = 7, column = 3)
-        self.checkin_zimmernr_entry = ttk.Entry(self, width=20)
-        self.checkin_zimmernr_entry.grid(row = 8, column = 0)
-        self.button_send = ttk.Button(self, text="CHECKIN",command=lambda: self.checkin()).grid(row = 8, column = 1)
-        self.button_send = ttk.Button(self, text="CHECKOUT",command=lambda: self.checkout()).grid(row = 8, column = 3)
-        self.button_quit = ttk.Button(self, text="QUIT", command=quit).grid(row = 8, column = 4)
-
-    def show_detail(self, selection):
-        try:
-            self.selection = selection.widget
-            self.selectindex = self.selection.curselection()[0]
-            self.selection = self.selection.get(self.selectindex)
-        except:
-            pass
-        try:
-            self.selectindex = int(selection)
-        except:
-            pass
-        print (str(self.selection) + str(self.selectindex))
-        self.zimmernr_entry.delete(0, "end")
-        self.status_entry.delete(0, "end")
-        self.gast_entry.delete(0, "end")
-        self.checkin_gastname_entry.delete(0, "end")
-        self.checkin_geburtsdatum_entry.delete(0, "end")
-        self.checkin_anreise_entry.delete(0, "end")
-        self.checkin_abreise_entry.delete(0, "end")
-        self.checkin_zimmernr_entry.delete(0, "end")
-        self.zimmernr_entry.insert(0, hotel.zimmerauflistung[self.selectindex].zimmernummer)
-        self.status_entry.insert(0, hotel.zimmerauflistung[self.selectindex].status)
-        self.gast_entry.insert(0, hotel.zimmerauflistung[self.selectindex].gast)
-        self.checkin_gastname_entry.insert(0, hotel.zimmerauflistung[self.selectindex].gast)
-        #self.checkin_geburtsdatum_entry.insert(1, hotel.zimmerauflistung[self.selectindex].geburtsdatum)
-        self.checkin_anreise_entry.insert(0, hotel.zimmerauflistung[self.selectindex].anreise)
-        self.checkin_abreise_entry.insert(0, hotel.zimmerauflistung[self.selectindex].abreise)
-        self.checkin_zimmernr_entry.insert(0, hotel.zimmerauflistung[self.selectindex].zimmernummer)
-
-    def checkin(self):
-        self.geburtsdatuminsert = self.checkin_geburtsdatum_entry.get()
-        self.zimmernrinsert = int(self.checkin_zimmernr_entry.get())
-        hotel.zimmerauflistung[self.zimmernrinsert].zimmernummer = self.zimmernrinsert
-        hotel.zimmerauflistung[self.zimmernrinsert].status = "Besetzt"
-        hotel.zimmerauflistung[self.zimmernrinsert].gast = self.checkin_gastname_entry.get()
-        hotel.zimmerauflistung[self.zimmernrinsert].anreise = self.checkin_anreise_entry.get()
-        hotel.zimmerauflistung[self.zimmernrinsert].abreise = self.checkin_abreise_entry.get()
-        self.zimmerliste.delete(self.zimmernrinsert)
-        self.zimmerliste.insert(self.zimmernrinsert, "Zimmernr. " + str(self.zimmernrinsert) + ", Status: " + hotel.zimmerauflistung[self.zimmernrinsert].status)
-        self.show_detail(self.zimmernrinsert)
-
-    def checkout(self):
-        self.geburtsdatuminsert = self.checkin_geburtsdatum_entry.get()
-        self.zimmernrinsert = int(self.checkin_zimmernr_entry.get())
-        hotel.zimmerauflistung[self.zimmernrinsert].zimmernummer = self.zimmernrinsert
-        hotel.zimmerauflistung[self.zimmernrinsert].status = "Frei"
-        hotel.zimmerauflistung[self.zimmernrinsert].gast = ""
-        hotel.zimmerauflistung[self.zimmernrinsert].anreise = ""
-        hotel.zimmerauflistung[self.zimmernrinsert].abreise = ""
-        self.zimmerliste.delete(self.zimmernrinsert)
-        self.zimmerliste.insert(self.zimmernrinsert, "Zimmernr. " + str(self.zimmernrinsert) + ", Status: " + hotel.zimmerauflistung[self.zimmernrinsert].status)
-        self.show_detail(self.zimmernrinsert)
+    def login(self):
+        root.login = True
+        print(root.login)
 
 
+class Main_Page(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent)
 
-class guestpage(tk.Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent)
-        pass
-
-class Hotel:
-    def __init__(self, hotelname, anzahlzimmer):
-        self.hotelname = hotelname
-        self.anzahlzimmer = anzahlzimmer
-        self.zimmerauflistung = []
-        i = 0
-        while i < anzahlzimmer:
-            self.zimmerauflistung.append(Zimmer(i+1, "Frei", "", "", ""))
-            i += 1
-
-class Zimmer(Hotel):
-    def __init__(self, nr, status, gast, anreise, abreise):
-        self.zimmernummer = nr
-        self.status = status
-        self.gast = gast
-        self.anreise = anreise
-        self.abreise = abreise
-
-class Gast:
-    def __init__(self, name, gebdatum, anreise, abreise):
-        self.name = name
-        self.geburtsdatum = gebdatum
-        self.anreise = anreise
-        self.abreise = abreise
+        self.grid_propagate(True)
+        self.config(borderwidth=0, bg="red")
+        self.button = tk.Button(self, text="Test")
+        self.button.grid(row=1, column=0, sticky=E)
+        self.button1 = tk.Button(self, text="Test")
+        self.button1.grid(row=1, column=1, sticky=E)
+        self.button2 = tk.Button(self, text="Test")
+        self.button2.grid(row=1, column=2, sticky=E)
+        self.button3 = tk.Button(self, text="Test")
+        self.button3.grid(row=1, column=3, sticky=E)
+        self.button4 = tk.Button(self, text="Test")
+        self.button4.grid(row=1, column=4, sticky=E)
 
 
-hotel = Hotel("Asklepios", 30)
-rootw = root()
-rootw.geometry("1200x800+50+50")
-rootw.mainloop()
+class Second_Page(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent)
+
+        self.grid_propagate(True)
+        self.config(borderwidth=0, bg="red")
+        self.button = tk.Button(self, text="Test2")
+        self.button.grid(row=1, column=0, sticky=E)
+        self.button1 = tk.Button(self, text="Test2")
+        self.button1.grid(row=1, column=1, sticky=E)
+        self.button2 = tk.Button(self, text="Test2")
+        self.button2.grid(row=1, column=2, sticky=E)
+        self.button3 = tk.Button(self, text="Test2")
+        self.button3.grid(row=1, column=3, sticky=E)
+        self.button4 = tk.Button(self, text="Test2")
+        self.button4.grid(row=1, column=4, sticky=E)
+
+
+class Error_Page(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent)
+
+        self.grid_propagate(True)
+        self.config(borderwidth=0, bg="red")
+        self.button = tk.Button(self, text="Error, tried to call Welcome Page")
+        self.button.grid(row=1, column=0, sticky=E)
+        self.button1 = tk.Button(self, text="Test2")
+        self.button1.grid(row=1, column=1, sticky=E)
+        self.button2 = tk.Button(self, text="Test2")
+        self.button2.grid(row=1, column=2, sticky=E)
+        self.button3 = tk.Button(self, text="Test2")
+        self.button3.grid(row=1, column=3, sticky=E)
+        self.button4 = tk.Button(self, text="Test2")
+        self.button4.grid(row=1, column=4, sticky=E)
+
+
+if __name__ == "__main__":
+    rootw = root()
+    rootw.resizable(True, True)
+    rootw.geometry("800x600+500+100")
+    rootw.mainloop()
