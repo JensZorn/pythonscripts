@@ -4,6 +4,7 @@ import random
 from time import sleep
 import json
 
+
 FragenListe = open("umschulung_ibb/standard_fragen.json", "r")
 FragenListe = json.load(FragenListe)
 
