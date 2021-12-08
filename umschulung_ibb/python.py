@@ -11,21 +11,9 @@
 # <°))))><
 ###############################################################################
 
-import tkinter as tk
-root = tk.Tk()
+# import tkinter as tk
+# import random
 
 
-str1 = tk.StringVar()
-str2 = tk.StringVar()
-str3 = tk.StringVar()
-str1.set("Test1")
-str2.set("Test2")
-str3.set("Test3")
-list = (str1.get(), str2.get(), str3.get())
-print(list[1])
-str1.set("Test1")
-str2.set("Test4")
-str3.set("Test3")
-list = (str1.get(), str2.get(), str3.get())
-print(list[1])
-root.mainloop()
+pool = set(range(1, 10))
+chosen = set()

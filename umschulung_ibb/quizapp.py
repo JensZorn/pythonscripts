@@ -5,8 +5,8 @@ from time import sleep
 import json
 
 
-FragenListe = open("umschulung_ibb/standard_fragen.json", "r")
-FragenListe = json.load(FragenListe)
+FragList = open("umschulung_ibb/standard_fragen.json", "r")
+FragList = json.load(FragList)
 
 
 class QuizApp(tk.Tk):
@@ -40,23 +40,32 @@ class QuizApp(tk.Tk):
 
         self.Antwort = ["", "", "", ""]
         self.Antwort[0] = ttk.Radiobutton(
-            self, textvariable=self.Antwort0text, variable=self.Auswahl, value=0)
+            self, textvar=self.Antwort0text, variable=self.Auswahl, value=0)
         self.Antwort[0].pack()
 
         self.Antwort[1] = ttk.Radiobutton(
-            self, textvariable=self.Antwort1text, variable=self.Auswahl, value=1)
+            self, textvar=self.Antwort1text, variable=self.Auswahl, value=1)
         self.Antwort[1].pack()
 
         self.Antwort[2] = ttk.Radiobutton(
-            self, textvariable=self.Antwort2text, variable=self.Auswahl, value=2)
+            self, textvar=self.Antwort2text, variable=self.Auswahl, value=2)
         self.Antwort[2].pack()
 
         self.Antwort[3] = ttk.Radiobutton(
-            self, textvariable=self.Antwort3text, variable=self.Auswahl, value=3)
+            self, textvar=self.Antwort3text, variable=self.Auswahl, value=3)
         self.Antwort[3].pack()
         self.Enter = ttk.Button(self, text="Abschicken",
-                                command=self.ErgebnisPrüfen, style="Abschicken.TButton")
+                                command=self.ErgebnisPrüfen,
+                                style="Abschicken.TButton")
         self.Enter.pack(pady=20)
+
+        self.Fragenpool = set()
+        self.Highscore = set()
+        i = 0
+        while i < len(FragList):
+            self.Fragenpool.add(i)
+            i += 1
+        self.Beantwortetpool = set()
 
         self.FragenAufrufen()
 
@@ -67,35 +76,43 @@ class QuizApp(tk.Tk):
         self.Antwort[2].config(style="Antwort.TButton")
         self.Antwort[3].config(style="Antwort.TButton")
         self.update_idletasks()
-        self.index = random.randint(0, len(FragenListe) - 1)
+
+        self.index = random.choice(
+            list(self.Fragenpool - self.Beantwortetpool))
+        self.Beantwortetpool.add(self.index)
 
         self.Fragenfeld.tag_configure("fragentext", justify='center')
 
         self.Fragenfeld.delete(1.0, tk.END)
-        self.Fragenfeld.insert(tk.END, FragenListe[self.index]["Frage"])
+
+        self.Fragenfeld.insert(tk.END, FragList[self.index]["Frage"])
 
         self.Fragenfeld.tag_add("fragentext", "1.0", "end")
 
-        self.Antwortenliste = [FragenListe[self.index]["RichtigeAntwort"], FragenListe[self.index]["FalscheAntwort1"],
-                               FragenListe[self.index]["FalscheAntwort2"], FragenListe[self.index]["FalscheAntwort3"]]
-        random.shuffle(self.Antwortenliste)
-        self.Antwort0text.set(self.Antwortenliste[0])
-        self.Antwort1text.set(self.Antwortenliste[1])
-        self.Antwort2text.set(self.Antwortenliste[2])
-        self.Antwort3text.set(self.Antwortenliste[3])
+        self.Antwliste = []
+        self.Antwliste = [FragList[self.index]["RichtigeAntwort"],
+                          FragList[self.index]["FalscheAntwort1"],
+                          FragList[self.index]["FalscheAntwort2"],
+                          FragList[self.index]["FalscheAntwort3"]]
+        random.shuffle(self.Antwliste)
+        self.Antwort0text.set(self.Antwliste[0])
+        self.Antwort1text.set(self.Antwliste[1])
+        self.Antwort2text.set(self.Antwliste[2])
+        self.Antwort3text.set(self.Antwliste[3])
         self.update_idletasks()
 
     def ErgebnisPrüfen(self):
 
         Ergebnis = self.Auswahl.get()
 
-        if self.Antwortenliste[Ergebnis] == FragenListe[self.index]["RichtigeAntwort"]:
+        if self.Antwliste[Ergebnis] == FragList[self.index]["RichtigeAntwort"]:
 
             self.Antwort[Ergebnis].config(style="RichtigeAntwort.TButton")
-
+            self.Highscore.add(True)
         else:
 
             self.Antwort[Ergebnis].config(style="FalscheAntwort.TButton")
+            self.Highscore.add(False)
 
         self.update_idletasks()
         sleep(2)
