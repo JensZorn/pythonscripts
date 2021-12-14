@@ -5,7 +5,7 @@ from time import sleep
 import json
 
 
-FragList = open("umschulung_ibb/standard_fragen.json", "r")
+FragList = open("standard_fragen.json", "r")
 FragList = json.load(FragList)
 
 
